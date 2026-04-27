@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:six_seven/core/constants/app_assets.dart';
+import 'package:six_seven/features/main/services/start_sound_player.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -13,6 +15,7 @@ class StartScreen extends StatefulWidget {
 class _StartScreenState extends State<StartScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  final StartSoundPlayer _soundPlayer = StartSoundPlayer();
 
   @override
   void initState() {
@@ -26,15 +29,34 @@ class _StartScreenState extends State<StartScreen>
   @override
   void dispose() {
     _controller.dispose();
+    unawaited(_soundPlayer.dispose());
     super.dispose();
   }
 
-  void _startMemeMotion() {
+  Future<void> _startMemeMotion() async {
     if (_controller.isAnimating) {
       return;
     }
 
+    unawaited(_playTapSound());
     _controller.repeat(reverse: true);
+    await Future<void>.delayed(const Duration(seconds: 2));
+
+    if (!mounted) {
+      return;
+    }
+
+    _controller
+      ..stop()
+      ..value = 0.5;
+  }
+
+  Future<void> _playTapSound() async {
+    try {
+      await _soundPlayer.play();
+    } on Object {
+      // The meme animation should still run even if audio playback is unavailable.
+    }
   }
 
   @override
