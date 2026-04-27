@@ -79,31 +79,27 @@ class _SixSevenBackground extends StatelessWidget {
         final rowCount = (constraints.maxHeight / rowHeight).ceil() + 2;
 
         return ClipRect(
-          child: OverflowBox(
-            alignment: Alignment.topLeft,
-            minWidth: constraints.maxWidth,
-            maxWidth: constraints.maxWidth + fontSize * 2,
-            minHeight: constraints.maxHeight,
-            maxHeight: constraints.maxHeight + rowHeight,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: List.generate(rowCount, (rowIndex) {
-                final word = _words[rowIndex.isEven ? 0 : 1];
-                final color = rowIndex.isEven
-                    ? const Color(0xFF383E3E)
-                    : const Color(0xFF00565B);
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: List.generate(rowCount, (rowIndex) {
+              final word = _words[rowIndex.isEven ? 0 : 1];
+              final color = rowIndex.isEven
+                  ? const Color(0xFF383E3E)
+                  : const Color(0xFF00565B);
 
-                return SizedBox(
-                  height: rowHeight,
-                  child: _RepeatedWordRow(
-                    word: word,
-                    color: color,
-                    fontSize: fontSize,
-                    shifted: rowIndex.isOdd,
-                  ),
-                );
-              }),
-            ),
+              return Positioned(
+                top: rowIndex * rowHeight,
+                left: 0,
+                right: 0,
+                height: rowHeight,
+                child: _RepeatedWordRow(
+                  word: word,
+                  color: color,
+                  fontSize: fontSize,
+                  shifted: rowIndex.isOdd,
+                ),
+              );
+            }),
           ),
         );
       },
