@@ -12,7 +12,5 @@ class StartSoundPlayer {
     );
   }
 
-  Future<void> dispose() {
-    return _player.dispose();
-  }
+  Future<void> dispose() => _player.dispose();
 }
