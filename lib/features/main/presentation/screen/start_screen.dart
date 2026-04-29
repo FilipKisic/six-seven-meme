@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:six_seven/core/constants/app_assets.dart';
+import 'package:six_seven/features/main/services/ad_service.dart';
 import 'package:six_seven/features/main/services/start_sound_player.dart';
+import 'package:six_seven/features/main/services/tap_counter_storage.dart';
 
 class StartScreen extends StatefulWidget {
   const StartScreen({super.key});
@@ -12,10 +15,11 @@ class StartScreen extends StatefulWidget {
   State<StartScreen> createState() => _StartScreenState();
 }
 
-class _StartScreenState extends State<StartScreen>
-    with SingleTickerProviderStateMixin {
+class _StartScreenState extends State<StartScreen> with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   final StartSoundPlayer _soundPlayer = StartSoundPlayer();
+  final TapCounterStorage _tapCounterStorage = TapCounterStorage();
+  final AdService _adService = AdService();
 
   @override
   void initState() {
@@ -24,13 +28,17 @@ class _StartScreenState extends State<StartScreen>
       vsync: this,
       duration: const Duration(milliseconds: 680),
     )..value = 0.5;
+    _adService
+      ..loadBanner(onLoaded: _handleBannerLoaded)
+      ..loadInterstitial();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    unawaited(_soundPlayer.dispose());
-    super.dispose();
+  void _handleBannerLoaded() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {});
   }
 
   Future<void> _startMemeMotion() async {
@@ -39,6 +47,7 @@ class _StartScreenState extends State<StartScreen>
     }
 
     unawaited(_playTapSound());
+    unawaited(_handleInterstitialTap());
     _controller.repeat(reverse: true);
     await Future<void>.delayed(const Duration(seconds: 2));
 
@@ -55,12 +64,28 @@ class _StartScreenState extends State<StartScreen>
     try {
       await _soundPlayer.play();
     } on Object {
-      // The meme animation should still run even if audio playback is unavailable.
+      debugPrint('Failed to play sound');
+    }
+  }
+
+  Future<void> _handleInterstitialTap() async {
+    try {
+      final shouldShowInterstitial = await _tapCounterStorage.registerTapAndShouldShowInterstitial();
+
+      if (!mounted || !shouldShowInterstitial) {
+        return;
+      }
+
+      await _adService.showInterstitial();
+    } on Object catch (error) {
+      debugPrint('Failed to handle interstitial tap: $error');
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final bannerAd = _adService.bannerAd;
+
     return Scaffold(
       backgroundColor: const Color(0xFF111616),
       body: GestureDetector(
@@ -78,11 +103,28 @@ class _StartScreenState extends State<StartScreen>
                 alignment: Alignment(0, 0.63),
                 child: _BottomPrompt(),
               ),
+              if (bannerAd != null)
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: SizedBox(
+                    width: bannerAd.size.width.toDouble(),
+                    height: bannerAd.size.height.toDouble(),
+                    child: AdWidget(ad: bannerAd),
+                  ),
+                ),
             ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    unawaited(_soundPlayer.dispose());
+    _adService.dispose();
+    super.dispose();
   }
 }
 
@@ -105,9 +147,7 @@ class _SixSevenBackground extends StatelessWidget {
             clipBehavior: Clip.none,
             children: List.generate(rowCount, (rowIndex) {
               final word = _words[rowIndex.isEven ? 0 : 1];
-              final color = rowIndex.isEven
-                  ? const Color(0xFF383E3E)
-                  : const Color(0xFF00565B);
+              final color = rowIndex.isEven ? const Color(0xFF383E3E) : const Color(0xFF00565B);
 
               return Positioned(
                 top: rowIndex * rowHeight,
