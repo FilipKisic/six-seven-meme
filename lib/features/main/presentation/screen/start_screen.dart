@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:six_seven/core/constants/app_assets.dart';
 import 'package:six_seven/features/main/services/ad_service.dart';
+import 'package:six_seven/features/main/services/consent_service.dart';
 import 'package:six_seven/features/main/services/start_sound_player.dart';
 import 'package:six_seven/features/main/services/tap_counter_storage.dart';
 
@@ -20,6 +21,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   final StartSoundPlayer _soundPlayer = StartSoundPlayer();
   final TapCounterStorage _tapCounterStorage = TapCounterStorage();
   final AdService _adService = AdService();
+  final ConsentService _consentService = ConsentService();
 
   @override
   void initState() {
@@ -28,6 +30,14 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
       vsync: this,
       duration: const Duration(milliseconds: 680),
     )..value = 0.5;
+    // Consent must be gathered before ads can load. The form (if required) is
+    // shown as a native overlay after the first frame is rendered.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initializeAds());
+  }
+
+  Future<void> _initializeAds() async {
+    final canRequestAds = await _consentService.gatherConsentAndInitialize();
+    if (!mounted || !canRequestAds) return;
     _adService
       ..loadBanner(onLoaded: _handleBannerLoaded)
       ..loadInterstitial();
