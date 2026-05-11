@@ -1,4 +1,4 @@
-package com.example.six_seven
+package kisic.filip.sixseven
 
 import io.flutter.embedding.android.FlutterActivity
 
