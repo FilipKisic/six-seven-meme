@@ -26,12 +26,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 680),
-    )..value = 0.5;
-    // Consent must be gathered before ads can load. The form (if required) is
-    // shown as a native overlay after the first frame is rendered.
+    _controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 680))..value = 0.5;
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeAds());
   }
 
@@ -44,26 +39,19 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   }
 
   void _handleBannerLoaded() {
-    if (!mounted) {
-      return;
-    }
-
+    if (!mounted) return;
     setState(() {});
   }
 
   Future<void> _startMemeMotion() async {
-    if (_controller.isAnimating) {
-      return;
-    }
+    if (_controller.isAnimating) return;
 
     unawaited(_playTapSound());
     unawaited(_handleInterstitialTap());
     _controller.repeat(reverse: true);
     await Future<void>.delayed(const Duration(seconds: 2));
 
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     _controller
       ..stop()
@@ -82,9 +70,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
     try {
       final shouldShowInterstitial = await _tapCounterStorage.registerTapAndShouldShowInterstitial();
 
-      if (!mounted || !shouldShowInterstitial) {
-        return;
-      }
+      if (!mounted || !shouldShowInterstitial) return;
 
       await _adService.showInterstitial();
     } on Object catch (error) {
@@ -109,10 +95,7 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
             children: [
               const _SixSevenBackground(),
               Center(child: _AnimatedHands(animation: _controller)),
-              const Align(
-                alignment: Alignment(0, 0.63),
-                child: _BottomPrompt(),
-              ),
+              const Align(alignment: Alignment(0, 0.63), child: _BottomPrompt()),
               if (bannerAd != null)
                 Align(
                   alignment: Alignment.bottomCenter,

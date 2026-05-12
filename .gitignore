@@ -6,6 +6,7 @@
 *.swp
 .buildlog/
 .history
+.idea/
 
 
 
@@ -56,6 +57,8 @@ unlinked_spec.ds
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 *.jks
+*.aab
+**/android/.idea
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

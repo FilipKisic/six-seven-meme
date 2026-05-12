@@ -141,19 +141,20 @@ class AdService {
 
   static String get _bannerAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/6300978111';
+      return 'ca-app-pub-3905541615928409/2316558211';
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/2934735716';
+      return 'ca-app-pub-3905541615928409/6064231539';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
   }
 
+
   static String get _interstitialAdUnitId {
     if (Platform.isAndroid) {
-      return 'ca-app-pub-3940256099942544/1033173712';
+      return 'ca-app-pub-3905541615928409/7663194179';
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3940256099942544/4411468910';
+      return 'ca-app-pub-3905541615928409/3723949168';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
