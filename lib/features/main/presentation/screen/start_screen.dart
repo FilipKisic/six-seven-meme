@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:six_seven/core/constants/app_assets.dart';
 import 'package:six_seven/features/main/services/ad_service.dart';
@@ -82,30 +83,35 @@ class _StartScreenState extends State<StartScreen> with SingleTickerProviderStat
   Widget build(BuildContext context) {
     final bannerAd = _adService.bannerAd;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFF111616),
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _startMemeMotion,
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              const _SixSevenBackground(),
-              Center(child: _AnimatedHands(animation: _controller)),
-              const Align(alignment: Alignment(0, 0.63), child: _BottomPrompt()),
-              if (bannerAd != null)
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: SizedBox(
-                    width: bannerAd.size.width.toDouble(),
-                    height: bannerAd.size.height.toDouble(),
-                    child: AdWidget(ad: bannerAd),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: const Color(0xFF111616),
+        body: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _startMemeMotion,
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                const _SixSevenBackground(),
+                Center(child: _AnimatedHands(animation: _controller)),
+                const Align(alignment: Alignment(0, 0.63), child: _BottomPrompt()),
+                if (bannerAd != null)
+                  SafeArea(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(
+                        width: bannerAd.size.width.toDouble(),
+                        height: bannerAd.size.height.toDouble(),
+                        child: AdWidget(ad: bannerAd),
+                      ),
+                    ),
                   ),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
