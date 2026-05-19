@@ -143,7 +143,7 @@ class AdService {
     if (Platform.isAndroid) {
       return 'ca-app-pub-3905541615928409/2316558211';
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3905541615928409/6064231539';
+      return 'ca-app-pub-3940256099942544/2934735716';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
@@ -154,7 +154,7 @@ class AdService {
     if (Platform.isAndroid) {
       return 'ca-app-pub-3905541615928409/7663194179';
     } else if (Platform.isIOS) {
-      return 'ca-app-pub-3905541615928409/3723949168';
+      return 'ca-app-pub-3940256099942544/4411468910';
     } else {
       throw UnsupportedError('Unsupported platform');
     }
